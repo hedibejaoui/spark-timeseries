@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: sparkts
+Version: 0.4.0
+Summary: A library for analyzing large time series data with Apache Spark
+Home-page: https://github.com/sryza/spark-timeseries
+Author: Sandy Ryza
+Author-email: sandy@cloudera.com
+License: UNKNOWN
+Description: UNKNOWN
+Keywords: spark,time,series,data,analysis
+Platform: UNKNOWN
