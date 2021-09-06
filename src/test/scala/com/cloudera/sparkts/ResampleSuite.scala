@@ -23,7 +23,7 @@ import org.scalatest._
 
 import scala.collection.mutable.ArrayBuffer
 
-class ResampleSuite extends FunSuite with ShouldMatchers {
+class ResampleSuite extends FunSuite with Matchers {
   def verify(
       series: String,
       closedRight: Boolean,

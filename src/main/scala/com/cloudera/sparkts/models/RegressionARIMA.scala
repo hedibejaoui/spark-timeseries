@@ -125,8 +125,8 @@ object RegressionARIMA {
       // X_dash_t = X_t - rho *X_t-1
       // Note: use braces in breeze.lang operators to enforce precedence, as it seems not to follow
       // the defaults
-      val Xdash: DenseMatrix[Double] = regressors((1 to regressors.rows - 1), ::) -
-        (regressors((0 to regressors.rows - 2), ::) :* rhos(iter))
+      val Xdash: DenseMatrix[Double] = regressors(1 until regressors.rows, ::) -
+        (regressors(0 to regressors.rows - 2, ::) *:* rhos(iter))
       val XdashArr = new Array[Array[Double]](Xdash.rows)
       (0 until Xdash.rows).foreach(r => XdashArr(r) = Xdash(r, ::).inner.toArray)
 

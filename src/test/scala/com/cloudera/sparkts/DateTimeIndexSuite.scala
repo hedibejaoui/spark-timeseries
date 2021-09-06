@@ -15,15 +15,15 @@
 
 package com.cloudera.sparkts
 
-import org.scalatest.{FunSuite, ShouldMatchers}
+import org.scalatest.{FunSuite, Matchers}
 import java.time._
 import java.time.format._
 import com.cloudera.sparkts.DateTimeIndex._
 import org.threeten.extra.Interval
 
-class DateTimeIndexSuite extends FunSuite with ShouldMatchers {
+class DateTimeIndexSuite extends FunSuite with Matchers {
 
-  val UTC = ZoneId.of("Z")
+  val UTC: ZoneId = ZoneId.of("Z")
 
   test("LongToDateTimeZone and vice versa") {
     val zdt = ZonedDateTime.of(1990, 4, 10, 0, 0, 0, 0, ZoneId.systemDefault())
@@ -90,8 +90,8 @@ class DateTimeIndexSuite extends FunSuite with ShouldMatchers {
     verifySlice(index.slice(ZonedDateTime.of(2015, 4, 14, 0, 0, 0, 0, UTC),
       ZonedDateTime.of(2015, 4, 16, 0, 0, 0, 0, UTC)))
     verifySlice(index.slice(Interval.of(
-      ZonedDateTime.of(2015, 4, 14, 0, 0, 0, 0, UTC).toInstant(),
-      ZonedDateTime.of(2015, 4, 16, 0, 0, 0, 0, UTC).toInstant())))
+      ZonedDateTime.of(2015, 4, 14, 0, 0, 0, 0, UTC).toInstant,
+      ZonedDateTime.of(2015, 4, 16, 0, 0, 0, 0, UTC).toInstant)))
     verifySlice(index.islice(2, 4))
     verifySlice(index.islice(2 until 4))
     verifySlice(index.islice(2 to 3))
@@ -128,8 +128,8 @@ class DateTimeIndexSuite extends FunSuite with ShouldMatchers {
     verifySlice(index.slice(ZonedDateTime.of(2015, 4, 15, 0, 0, 0, 0, UTC),
       ZonedDateTime.of(2015, 4, 22, 0, 0, 0, 0, UTC)))
     verifySlice(index.slice(Interval.of(
-      ZonedDateTime.of(2015, 4, 15, 0, 0, 0, 0, UTC).toInstant(),
-      ZonedDateTime.of(2015, 4, 22, 0, 0, 0, 0, UTC).toInstant())))
+      ZonedDateTime.of(2015, 4, 15, 0, 0, 0, 0, UTC).toInstant,
+      ZonedDateTime.of(2015, 4, 22, 0, 0, 0, 0, UTC).toInstant)))
     verifySlice(index.islice(1, 4))
     verifySlice(index.islice(1 until 4))
     verifySlice(index.islice(1 to 3))
@@ -255,13 +255,13 @@ class DateTimeIndexSuite extends FunSuite with ShouldMatchers {
     rebaseDayOfWeek(DayOfWeek.SATURDAY.getValue, firstDayOfWeekSunday) should be (7)
 
     val firstDayOfWeekMonday = DayOfWeek.MONDAY
-    rebaseDayOfWeek(DayOfWeek.SUNDAY.getValue, firstDayOfWeekMonday.getValue()) should be (7)
-    rebaseDayOfWeek(DayOfWeek.MONDAY.getValue, firstDayOfWeekMonday.getValue()) should be (1)
-    rebaseDayOfWeek(DayOfWeek.TUESDAY.getValue, firstDayOfWeekMonday.getValue()) should be (2)
-    rebaseDayOfWeek(DayOfWeek.WEDNESDAY.getValue, firstDayOfWeekMonday.getValue()) should be (3)
-    rebaseDayOfWeek(DayOfWeek.THURSDAY.getValue, firstDayOfWeekMonday.getValue()) should be (4)
-    rebaseDayOfWeek(DayOfWeek.FRIDAY.getValue, firstDayOfWeekMonday.getValue()) should be (5)
-    rebaseDayOfWeek(DayOfWeek.SATURDAY.getValue, firstDayOfWeekMonday.getValue()) should be (6)
+    rebaseDayOfWeek(DayOfWeek.SUNDAY.getValue, firstDayOfWeekMonday.getValue) should be (7)
+    rebaseDayOfWeek(DayOfWeek.MONDAY.getValue, firstDayOfWeekMonday.getValue) should be (1)
+    rebaseDayOfWeek(DayOfWeek.TUESDAY.getValue, firstDayOfWeekMonday.getValue) should be (2)
+    rebaseDayOfWeek(DayOfWeek.WEDNESDAY.getValue, firstDayOfWeekMonday.getValue) should be (3)
+    rebaseDayOfWeek(DayOfWeek.THURSDAY.getValue, firstDayOfWeekMonday.getValue) should be (4)
+    rebaseDayOfWeek(DayOfWeek.FRIDAY.getValue, firstDayOfWeekMonday.getValue) should be (5)
+    rebaseDayOfWeek(DayOfWeek.SATURDAY.getValue, firstDayOfWeekMonday.getValue) should be (6)
   }
 
   test("locAtDatetime returns -1") {
@@ -498,16 +498,16 @@ class DateTimeIndexSuite extends FunSuite with ShouldMatchers {
   test("locAtOrAfterDateTime vs insertionLoc - test case 6") {
     val dt = ZonedDateTime.of(2015, 4, 8, 0, 0, 0, 0, ZoneId.of("Z"))
     val samples = Array(
-      ((dt, Array(1.0, 2.0, 3.0))),
-      ((dt.plusMinutes(1), Array(4.0, 5.0, 6.0))),
-      ((dt.plusMinutes(2), Array(5.5, 6.5, 7.0))),
-      ((dt.plusMinutes(4), Array(7.9, 8.9, 9.9))),
-      ((dt.plusMinutes(7), Array(7.0, 8.0, 9.0))),
-      ((dt.plusMinutes(7).plusSeconds(5), Array(7.1, 8.2, 9.3))),
-      ((dt.plusMinutes(7).plusSeconds(15), Array(7.4, 8.4, 9.4))),
-      ((dt.plusMinutes(8), Array(6.0, 7.0, 8.0))),
-      ((dt.plusMinutes(12), Array(7.0, 8.0, 9.0))),
-      ((dt.plusMinutes(14), Array(10.5, 11.6, 12.7)))
+      (dt, Array(1.0, 2.0, 3.0)),
+      (dt.plusMinutes(1), Array(4.0, 5.0, 6.0)),
+      (dt.plusMinutes(2), Array(5.5, 6.5, 7.0)),
+      (dt.plusMinutes(4), Array(7.9, 8.9, 9.9)),
+      (dt.plusMinutes(7), Array(7.0, 8.0, 9.0)),
+      (dt.plusMinutes(7).plusSeconds(5), Array(7.1, 8.2, 9.3)),
+      (dt.plusMinutes(7).plusSeconds(15), Array(7.4, 8.4, 9.4)),
+      (dt.plusMinutes(8), Array(6.0, 7.0, 8.0)),
+      (dt.plusMinutes(12), Array(7.0, 8.0, 9.0)),
+      (dt.plusMinutes(14), Array(10.5, 11.6, 12.7))
     )
 
     val labels = Array("a", "b", "c")

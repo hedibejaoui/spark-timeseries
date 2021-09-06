@@ -19,7 +19,7 @@ import com.cloudera.sparkts.MatrixUtil._
 import org.apache.spark.mllib.linalg.{Matrices, Vectors}
 import org.scalatest._
 
-class MatrixUtilSuite extends FunSuite with ShouldMatchers {
+class MatrixUtilSuite extends FunSuite with Matchers {
   test("modifying toBreeze version modifies original tensor") {
     val vec = Vectors.dense(1.0, 2.0, 3.0)
     val breezeVec = toBreeze(vec)

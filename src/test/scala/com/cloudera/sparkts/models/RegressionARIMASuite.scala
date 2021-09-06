@@ -17,9 +17,9 @@ package com.cloudera.sparkts.models
 
 import breeze.linalg
 import breeze.linalg.DenseMatrix
-import org.scalatest.{FunSuite, ShouldMatchers}
+import org.scalatest.{FunSuite, Matchers}
 
-class RegressionARIMASuite extends FunSuite with ShouldMatchers {
+class RegressionARIMASuite extends FunSuite with Matchers {
   /**
    * Test cochrane orchutt method
    * ref: https://onlinecourses.science.psu.edu/stat501/node/365

@@ -53,8 +53,8 @@ private[sparkts] object Resample {
       stampRight: Boolean): Vector = {
     val tsarr = ts.toArray
     val result = new Array[Double](targetIndex.size)
-    val sourceIter = sourceIndex.nanosIterator().buffered
-    val targetIter = targetIndex.nanosIterator().buffered
+    val sourceIter = sourceIndex.nanosIterator.buffered
+    val targetIter = targetIndex.nanosIterator.buffered
 
     // Values within interval corresponding to stamp "c" (with next stamp at "n")
     //

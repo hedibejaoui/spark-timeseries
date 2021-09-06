@@ -93,7 +93,7 @@ class HoltWintersModel(
   if (!modelType.equalsIgnoreCase("additive") && !modelType.equalsIgnoreCase("multiplicative")) {
     throw new IllegalArgumentException("Invalid model type: " + modelType)
   }
-  val additive = modelType.equalsIgnoreCase("additive")
+  val additive: Boolean = modelType.equalsIgnoreCase("additive")
 
   /**
    * Calculates sum of squared errors, used to estimate the alpha and beta parameters
@@ -110,7 +110,7 @@ class HoltWintersModel(
     var sqrErrors = 0.0
 
     // We predict only from period by using the first period - 1 elements.
-    for(i <- period to (n - 1)) {
+    for(i <- period until n) {
       error = ts(i) - smoothed(i)
       sqrErrors += error * error
     }
@@ -131,7 +131,7 @@ class HoltWintersModel(
   override def addTimeDependentEffects(ts: Vector, dest: Vector): Vector = {
     val destArr = dest.toArray
     val fitted = getHoltWintersComponents(ts)._1
-    for (i <- 0 to (dest.size - 1)) {
+    for (i <- 0 until dest.size) {
       destArr(i) = fitted(i)
     }
     dest
@@ -190,11 +190,11 @@ class HoltWintersModel(
     val (initLevel, initTrend, initSeason) = initHoltWinters(ts)
     level(0) = initLevel
     trend(0) = initTrend
-    for (i <- 0 until initSeason.size){
+    for (i <- initSeason.indices){
       season(i) = initSeason(i)
     }
 
-    for (i <- 0 to (n - period - 1)) {
+    for (i <- 0 until n - period) {
       dest(i + period) = level(i) + trend(i)
 
       // Add the seasonal factor for additive and multiply for multiplicative model.
@@ -225,7 +225,7 @@ class HoltWintersModel(
     (Vectors.dense(dest), Vectors.dense(level), Vectors.dense(trend), Vectors.dense(season))
   }
 
-  def getKernel(): (Array[Double]) = {
+  def getKernel: Array[Double] = {
     if (period % 2 == 0){
       val kernel = Array.fill(period + 1)(1.0 / period)
       kernel(0) = 0.5 / period
@@ -243,9 +243,9 @@ class HoltWintersModel(
    * @param inData Series on which you want to do moving average
    * @param kernel Weight vector for weighted moving average
    */
-  def convolve(inData: Array[Double], kernel: Array[Double]): (Array[Double]) = {
-    val kernelSize = kernel.size
-    val dataSize = inData.size
+  def convolve(inData: Array[Double], kernel: Array[Double]): Array[Double] = {
+    val kernelSize = kernel.length
+    val dataSize = inData.length
 
     val outData = new Array[Double](dataSize - kernelSize + 1)
 
@@ -272,8 +272,8 @@ class HoltWintersModel(
     val arrTs = ts.toArray
 
     // Decompose a window of time series into level trend and seasonal using convolution
-    val kernel = getKernel()
-    val kernelSize = kernel.size
+    val kernel = getKernel
+    val kernelSize = kernel.length
     val trend = convolve(arrTs.take(period * 2), kernel)
 
     // Remove the trend from time series. Subtract for additive and divide for multiplicative
@@ -283,9 +283,9 @@ class HoltWintersModel(
       case (a, t) =>
         if (t != 0){
           if (additive) {
-            (a - t)
+            a - t
           } else {
-            (a / t)
+            a / t
           }
         }  else{
           0
@@ -294,7 +294,7 @@ class HoltWintersModel(
 
     // seasonal mean is sum of mean of all season values of that period
     val seasonalMean = removeTrend.splitAt(period).zipped.map { case (prevx, x) =>
-      if (prevx == 0 || x == 0) (x + prevx) else (x + prevx) / 2
+      if (prevx == 0 || x == 0) x + prevx else (x + prevx) / 2
     }
 
     val meanOfFigures = seasonalMean.sum / period
@@ -308,9 +308,9 @@ class HoltWintersModel(
     }
 
     // Do Simple Linear Regression to find the initial level and trend
-    val indices = 1 to trend.size
+    val indices = 1 to trend.length
     val xbar = (indices.sum: Double) / indices.size
-    val ybar = trend.sum / trend.size
+    val ybar = trend.sum / trend.length
 
     val xxbar = indices.map( x => (x - xbar) * (x - xbar) ).sum
     val xybar = indices.zip(trend).map {

@@ -18,10 +18,10 @@ package com.cloudera.sparkts
 import java.time.{ZonedDateTime, ZoneId}
 
 import com.cloudera.sparkts.DateTimeIndex._
-import org.scalatest.{FunSuite, ShouldMatchers}
+import org.scalatest.{FunSuite, Matchers}
 
-class DateTimeIndexUtilsSuite extends FunSuite with ShouldMatchers {
-  val UTC = ZoneId.of("Z")
+class DateTimeIndexUtilsSuite extends FunSuite with Matchers {
+  val UTC: ZoneId = ZoneId.of("Z")
 
   test("non-overlapping sorted") {
     val index1: DateTimeIndex = uniform(dt("2015-04-10"), 5, new DayFrequency(2), UTC)

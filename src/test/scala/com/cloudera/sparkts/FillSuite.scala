@@ -19,9 +19,9 @@ import scala.Double.NaN
 
 import com.cloudera.sparkts.UnivariateTimeSeries._
 
-import org.scalatest.{FunSuite, ShouldMatchers}
+import org.scalatest.{FunSuite, Matchers}
 
-class FillSuite extends FunSuite with ShouldMatchers {
+class FillSuite extends FunSuite with Matchers {
   ignore("nearest") {
     fillNearest(Array(1.0)) should be (Array(1.0))
     fillNearest(Array(1.0, 1.0, 2.0)) should be (Array(1.0, 1.0, 2.0))

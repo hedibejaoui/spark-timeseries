@@ -22,7 +22,7 @@ import com.cloudera.sparkts.{UniformDateTimeIndex, DateTimeIndex, TimeSeries}
 import org.apache.spark.mllib.linalg.{Vector, DenseMatrix}
 import org.apache.spark.api.java.function.{Function => JFunction, Function2 => JFunction2}
 
-import scala.collection.JavaConversions
+import scala.collection.JavaConverters
 import scala.reflect.ClassTag
 
 import JavaTimeSeries._
@@ -42,7 +42,7 @@ class JavaTimeSeries[K](val ts: TimeSeries[K])(implicit val kClassTag: ClassTag[
 
   def this(index: DateTimeIndex, data: DenseMatrix, keys: java.util.List[K])
     (implicit kClassTag: ClassTag[K]) {
-    this(index, data, JavaConversions.asScalaBuffer(keys).toArray)
+    this(index, data, JavaConverters.asScalaBuffer(keys).toArray)
   }
 
   def index: DateTimeIndex = ts.index
@@ -115,7 +115,7 @@ class JavaTimeSeries[K](val ts: TimeSeries[K])(implicit val kClassTag: ClassTag[
       laggedKey: JFunction2[K, java.lang.Integer, U])
     : JavaTimeSeries[U] = {
     implicit val classTagOfU: ClassTag[U] = classTagOf(laggedKey)
-    val map = JavaConversions.mapAsScalaMap(lagsPerCol).map {
+    val map = JavaConverters.mapAsScalaMap(lagsPerCol).map {
       a => (a._1, (a._2._1.booleanValue(), a._2._2.intValue()))
     }.toMap
     new JavaTimeSeries[U](ts.lags(map,
@@ -172,13 +172,13 @@ class JavaTimeSeries[K](val ts: TimeSeries[K])(implicit val kClassTag: ClassTag[
   def price2ret(): JavaTimeSeries[K] = new JavaTimeSeries[K](ts.price2ret())
 
   def univariateSeriesIterator(): java.util.Iterator[Vector] =
-    JavaConversions.asJavaIterator(ts.univariateSeriesIterator)
+    JavaConverters.asJavaIterator(ts.univariateSeriesIterator())
 
   def univariateKeyAndSeriesIterator(): java.util.Iterator[(K, Vector)] =
-    JavaConversions.asJavaIterator(ts.univariateKeyAndSeriesIterator)
+    JavaConverters.asJavaIterator(ts.univariateKeyAndSeriesIterator())
 
-  def toInstants(): java.util.List[(ZonedDateTime, Vector)] =
-    JavaConversions.seqAsJavaList(ts.toInstants())
+  def toInstants: java.util.List[(ZonedDateTime, Vector)] =
+    JavaConverters.seqAsJavaList(ts.toInstants())
 
   /**
    * Applies a transformation to each series that preserves the time index.
@@ -202,12 +202,12 @@ class JavaTimeSeries[K](val ts: TimeSeries[K])(implicit val kClassTag: ClassTag[
   }
 
   def mapValues[U](f: JFunction[Vector, U]): java.util.List[(K, U)] =
-    JavaConversions.seqAsJavaList(ts.mapValues((v: Vector) => f.call(v)))
+    JavaConverters.seqAsJavaList(ts.mapValues((v: Vector) => f.call(v)))
 
   /**
    * Gets the first univariate series and its key.
    */
-  def head(): (K, Vector) = ts.head
+  def head(): (K, Vector) = ts.head()
 
 }
 

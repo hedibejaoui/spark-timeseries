@@ -16,9 +16,9 @@
 package com.cloudera.sparkts.models
 
 import org.apache.spark.mllib.linalg._
-import org.scalatest.{FunSuite, ShouldMatchers}
+import org.scalatest.{FunSuite, Matchers}
 
-class EWMASuite extends FunSuite with ShouldMatchers {
+class EWMASuite extends FunSuite with Matchers {
   test("adding time dependent effects") {
     val orig = new DenseVector((1 to 10).toArray.map(_.toDouble))
 

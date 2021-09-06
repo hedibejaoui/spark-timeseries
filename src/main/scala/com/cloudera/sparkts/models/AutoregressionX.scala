@@ -17,7 +17,7 @@ package com.cloudera.sparkts.models
 
 import breeze.linalg._
 import com.cloudera.sparkts.Lag
-import com.cloudera.sparkts.MatrixUtil.{matToRowArrs, toBreeze}
+import com.cloudera.sparkts.MatrixUtil.matToRowArrs
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression
 
 /**

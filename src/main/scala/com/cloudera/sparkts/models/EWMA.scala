@@ -15,7 +15,6 @@
 
 package com.cloudera.sparkts.models
 
-import com.cloudera.sparkts.MatrixUtil
 import org.apache.commons.math3.analysis.{MultivariateFunction, MultivariateVectorFunction}
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer
 import org.apache.commons.math3.optim.nonlinear.scalar.{GoalType, ObjectiveFunction,

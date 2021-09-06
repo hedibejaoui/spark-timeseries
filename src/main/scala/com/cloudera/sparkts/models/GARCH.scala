@@ -17,8 +17,7 @@ package com.cloudera.sparkts.models
 
 import org.apache.commons.math3.analysis.{MultivariateFunction, MultivariateVectorFunction}
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer
-import org.apache.commons.math3.optim.nonlinear.scalar.{ObjectiveFunction,
-  ObjectiveFunctionGradient}
+import org.apache.commons.math3.optim.nonlinear.scalar.{ObjectiveFunction, ObjectiveFunctionGradient}
 import org.apache.commons.math3.optim.{InitialGuess, MaxEval, MaxIter, SimpleValueChecker}
 import org.apache.commons.math3.random.RandomGenerator
 import org.apache.spark.mllib.linalg.{DenseVector, Vector, Vectors}
@@ -81,7 +80,7 @@ class GARCHModel(
    */
   def logLikelihood(ts: Vector): Double = {
     var sum = 0.0
-    iterateWithHAndEta(ts) { (i, h, eta, prevH, prevEta) =>
+    iterateWithHAndEta(ts) { (_, h, eta, _, _) =>
       sum += -.5 * math.log(h) - .5 * eta * eta / h
     }
     sum + -.5 * math.log(2 * math.Pi) * (ts.size - 1)

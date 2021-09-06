@@ -15,9 +15,9 @@
 package com.cloudera.sparkts.parsers
 
 import java.time.ZoneId
-import org.scalatest.{FunSuite, ShouldMatchers}
+import org.scalatest.{FunSuite, Matchers}
 
-class YahooParserSuite extends FunSuite with ShouldMatchers {
+class YahooParserSuite extends FunSuite with Matchers {
   test("yahoo parser") {
     val is = getClass.getClassLoader.getResourceAsStream("GOOG.csv")
     val lines = scala.io.Source.fromInputStream(is).getLines().toArray

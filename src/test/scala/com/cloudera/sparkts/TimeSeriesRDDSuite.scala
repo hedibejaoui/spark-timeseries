@@ -27,11 +27,11 @@ import com.cloudera.sparkts.DateTimeIndex._
 import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.linalg.distributed.IndexedRow
-import org.scalatest.{FunSuite, ShouldMatchers}
+import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.Map
 
-class TimeSeriesRDDSuite extends FunSuite with LocalSparkContext with ShouldMatchers {
+class TimeSeriesRDDSuite extends FunSuite with LocalSparkContext with Matchers {
   test("slice") {
     val conf = new SparkConf().setMaster("local").setAppName(getClass.getName)
     TimeSeriesKryoRegistrator.registerKryoClasses(conf)
@@ -157,8 +157,8 @@ class TimeSeriesRDDSuite extends FunSuite with LocalSparkContext with ShouldMatc
     val (rowIndices, rowData) = indexedMatrix.rows.collect().map { case IndexedRow(ix, data) =>
       (ix, data.toArray)
     }.unzip
-    rowData.toArray should be ((0.0 to 3.0 by 1.0).map(x => (x until 20.0 by 4.0).toArray).toArray)
-    rowIndices.toArray should be (Array(0, 1, 2, 3))
+    rowData should be ((0.0 to 3.0 by 1.0).map(x => (x until 20.0 by 4.0).toArray).toArray)
+    rowIndices should be (Array(0, 1, 2, 3))
   }
 
   test("toRowMatrix") {
@@ -174,7 +174,7 @@ class TimeSeriesRDDSuite extends FunSuite with LocalSparkContext with ShouldMatc
     val tsRdd = new TimeSeriesRDD[String](index, rdd)
     val matrix = tsRdd.toRowMatrix()
     val rowData = matrix.rows.collect().map(_.toArray)
-    rowData.toArray should be ((0.0 to 3.0 by 1.0).map(x => (x until 20.0 by 4.0).toArray).toArray)
+    rowData should be ((0.0 to 3.0 by 1.0).map(x => (x until 20.0 by 4.0).toArray).toArray)
   }
 
   test("timeSeriesRDDFromObservations DataFrame") {
@@ -239,7 +239,7 @@ class TimeSeriesRDDSuite extends FunSuite with LocalSparkContext with ShouldMatc
 
     val index = uniform(start, 10, new DayFrequency(1))
     val rdd = new TimeSeriesRDD[String](index, sc.parallelize(vecs))
-    val lagTsrdd = rdd.lags(2, true, TimeSeries.laggedStringKey)
+    val lagTsrdd = rdd.lags(2, includeOriginals = true, TimeSeries.laggedStringKey)
 
     val cts = lagTsrdd.collectAsTimeSeries()
 
@@ -281,7 +281,7 @@ class TimeSeriesRDDSuite extends FunSuite with LocalSparkContext with ShouldMatc
 
     val index = uniform(start, 10, new DayFrequency(1))
     val rdd = new TimeSeriesRDD[String](index, sc.parallelize(vecs))
-    val lagTsrdd = rdd.lags(2, false, TimeSeries.laggedStringKey)
+    val lagTsrdd = rdd.lags(2, includeOriginals = false, TimeSeries.laggedStringKey)
 
     val cts = lagTsrdd.collectAsTimeSeries()
 

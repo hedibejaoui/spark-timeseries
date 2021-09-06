@@ -16,14 +16,14 @@
 package com.cloudera.sparkts
 
 import java.time._
-import java.util.Arrays
-
 import org.threeten.extra._
+
 import scala.annotation.tailrec
 import scala.language.implicitConversions
-
 import com.cloudera.sparkts.DateTimeIndex._
 import com.cloudera.sparkts.TimeSeriesUtils._
+
+import java.util
 
 /**
  * A DateTimeIndex maintains a bi-directional mapping between integers and an ordered collection of
@@ -132,22 +132,22 @@ trait DateTimeIndex extends Serializable {
   /**
    * Returns the contents of the DateTimeIndex as an array of nanosecond values from the epoch.
    */
-  def toNanosArray(): Array[Long]
+  def toNanosArray: Array[Long]
 
   /**
     * Returns the contents of the DateTimeIndex as an array of ZonedDateTime
     */
-  def toZonedDateTimeArray(): Array[ZonedDateTime]
+  def toZonedDateTimeArray: Array[ZonedDateTime]
 
   /**
    * Returns an iterator over the contents of the DateTimeIndex as nanosecond values from the epoch.
    */
-  def nanosIterator(): Iterator[Long]
+  def nanosIterator: Iterator[Long]
 
   /**
    * Returns an iterator over the contents of the DateTimeIndex as ZonedDateTime
    */
-  def zonedDateTimeIterator(): Iterator[ZonedDateTime]
+  def zonedDateTimeIterator: Iterator[ZonedDateTime]
 
   /**
    * Returns a new DateTimeIndex with instants at the specified zone
@@ -175,8 +175,8 @@ class UniformDateTimeIndex(
   override def size: Int = periods
 
   override def slice(interval: Interval): UniformDateTimeIndex = {
-    slice(ZonedDateTime.ofInstant(interval.getStart(), zone),
-      ZonedDateTime.ofInstant(interval.getEnd(), zone))
+    slice(ZonedDateTime.ofInstant(interval.getStart, zone),
+      ZonedDateTime.ofInstant(interval.getEnd, zone))
   }
 
   override def slice(start: ZonedDateTime, end: ZonedDateTime): UniformDateTimeIndex = {
@@ -261,7 +261,7 @@ class UniformDateTimeIndex(
     insertionLoc(longToZonedDateTime(dt, dateTimeZone))
   }
 
-  override def toNanosArray(): Array[Long] = {
+  override def toNanosArray: Array[Long] = {
     val arr = new Array[Long](periods)
     for (i <- 0 until periods) {
       arr(i) = zonedDateTimeToLong(dateTimeAtLoc(i))
@@ -269,7 +269,7 @@ class UniformDateTimeIndex(
     arr
   }
 
-  override def toZonedDateTimeArray(): Array[ZonedDateTime] = {
+  override def toZonedDateTimeArray: Array[ZonedDateTime] = {
     val arr = new Array[ZonedDateTime](periods)
     for (i <- 0 until periods) {
       arr(i) = dateTimeAtLoc(i)
@@ -292,11 +292,11 @@ class UniformDateTimeIndex(
       periods.toString, frequency.toString).mkString(",")
   }
 
-  override def nanosIterator(): Iterator[Long] = {
-    zonedDateTimeIterator.map(zonedDateTimeToLong(_))
+  override def nanosIterator: Iterator[Long] = {
+    zonedDateTimeIterator.map(zonedDateTimeToLong)
   }
 
-  override def zonedDateTimeIterator(): Iterator[ZonedDateTime] = {
+  override def zonedDateTimeIterator: Iterator[ZonedDateTime] = {
     (0 until periods).view.map(frequency.advance(start, _)).iterator
   }
 
@@ -315,8 +315,8 @@ class IrregularDateTimeIndex(
   extends DateTimeIndex {
 
   override def slice(interval: Interval): IrregularDateTimeIndex = {
-    slice(ZonedDateTime.ofInstant(interval.getStart(), zone),
-      ZonedDateTime.ofInstant(interval.getEnd(), zone))
+    slice(ZonedDateTime.ofInstant(interval.getStart, zone),
+      ZonedDateTime.ofInstant(interval.getEnd, zone))
   }
 
   override def slice(start: ZonedDateTime, end: ZonedDateTime): IrregularDateTimeIndex = {
@@ -396,11 +396,11 @@ class IrregularDateTimeIndex(
     }
   }
 
-  override def toNanosArray(): Array[Long] = {
+  override def toNanosArray: Array[Long] = {
     instants
   }
 
-  override def toZonedDateTimeArray(): Array[ZonedDateTime] = {
+  override def toZonedDateTimeArray: Array[ZonedDateTime] = {
     instants.map(l => longToZonedDateTime(l, dateTimeZone))
   }
 
@@ -410,7 +410,7 @@ class IrregularDateTimeIndex(
   }
 
   override def hashCode(): Int = {
-    Arrays.hashCode(instants)
+    util.Arrays.hashCode(instants)
   }
 
   override def toString: String = {
@@ -418,11 +418,11 @@ class IrregularDateTimeIndex(
       instants.map(longToZonedDateTime(_, dateTimeZone).toString).mkString(",")
   }
 
-  override def nanosIterator(): Iterator[Long] = {
+  override def nanosIterator: Iterator[Long] = {
     instants.iterator
   }
 
-  override def zonedDateTimeIterator(): Iterator[ZonedDateTime] = {
+  override def zonedDateTimeIterator: Iterator[ZonedDateTime] = {
     instants.iterator.map(longToZonedDateTime(_, dateTimeZone))
   }
 
@@ -641,11 +641,11 @@ class HybridDateTimeIndex(
     }
   }
 
-  override def toNanosArray(): Array[Long] = {
+  override def toNanosArray: Array[Long] = {
     indices.flatMap(_.toNanosArray)
   }
 
-  override def toZonedDateTimeArray(): Array[ZonedDateTime] = {
+  override def toZonedDateTimeArray: Array[ZonedDateTime] = {
     indices.flatMap(_.toZonedDateTimeArray)
   }
 
@@ -655,7 +655,7 @@ class HybridDateTimeIndex(
   }
 
   override def hashCode(): Int = {
-    Arrays.hashCode(indices.asInstanceOf[Array[AnyRef]])
+    util.Arrays.hashCode(indices.asInstanceOf[Array[AnyRef]])
   }
 
   override def toString: String = {
@@ -663,11 +663,11 @@ class HybridDateTimeIndex(
       indices.map(_.toString).mkString(";")
   }
 
-  override def nanosIterator(): Iterator[Long] = {
+  override def nanosIterator: Iterator[Long] = {
     indices.foldLeft(Iterator[Long]())(_ ++ _.nanosIterator)
   }
 
-  override def zonedDateTimeIterator(): Iterator[ZonedDateTime] = {
+  override def zonedDateTimeIterator: Iterator[ZonedDateTime] = {
     indices.foldLeft(Iterator[ZonedDateTime]())(_ ++ _.zonedDateTimeIterator)
   }
 

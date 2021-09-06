@@ -15,27 +15,24 @@
 
 package com.cloudera.sparkts.models
 
-import breeze.linalg.{DenseMatrix => BreezeDenseMatrix, DenseVector => BreezeDenseVector, diag, sum}
+import breeze.linalg.{diag, sum, DenseMatrix => BreezeDenseMatrix, DenseVector => BreezeDenseVector}
 import com.cloudera.sparkts.Lag
-import com.cloudera.sparkts.MatrixUtil.{toBreeze, dvBreezeToSpark}
+import com.cloudera.sparkts.MatrixUtil.{dvBreezeToSpark, toBreeze}
 import com.cloudera.sparkts.UnivariateTimeSeries.{differencesOfOrderD, inverseDifferencesOfOrderD}
 import com.cloudera.sparkts.stats.TimeSeriesStatisticalTests.kpsstest
-import org.apache.commons.math3.complex.Complex
-import org.apache.commons.math3.linear.{RealMatrix, MatrixUtils, EigenDecomposition}
-import org.apache.commons.math3.analysis.solvers.LaguerreSolver
 import org.apache.commons.math3.analysis.{MultivariateFunction, MultivariateVectorFunction}
+import org.apache.commons.math3.complex.Complex
+import org.apache.commons.math3.linear.{EigenDecomposition, MatrixUtils}
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer
-import org.apache.commons.math3.optim.nonlinear.scalar.{GoalType, ObjectiveFunction,
-  ObjectiveFunctionGradient}
-import org.apache.commons.math3.optim.{InitialGuess, MaxEval, MaxIter, SimpleBounds,
-   SimpleValueChecker}
+import org.apache.commons.math3.optim.nonlinear.scalar.{GoalType, ObjectiveFunction, ObjectiveFunctionGradient}
+import org.apache.commons.math3.optim._
 import org.apache.commons.math3.random.RandomGenerator
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression
 import org.apache.spark.mllib.linalg.{DenseVector, Vector}
 
-import scala.util.{Failure, Try}
-import scala.collection.mutable.HashSet
+import scala.collection.mutable
+import scala.util.Try
 
 /**
   * ARIMA models allow modeling timeseries as a function of prior values of the series
@@ -246,11 +243,11 @@ object ARIMA {
    * or invertibility, given AR and MA parameters, respectively
    */
   private def warnStationarityAndInvertibility(model: ARIMAModel): Unit = {
-    if (!model.isStationary()) {
+    if (!model.isStationary) {
       println("Warning: AR parameters are not stationary")
     }
 
-    if (!model.isInvertible()) {
+    if (!model.isInvertible) {
       println("Warning: MA parameters are not invertible")
     }
   }
@@ -319,7 +316,7 @@ object ARIMA {
     }
 
     // Maintain a set of parameters we've tried so we don't waste time repeating
-    val pastParams = new HashSet[(Int, Int, Boolean)]()
+    val pastParams = new mutable.HashSet[(Int, Int, Boolean)]()
     var curBestAIC = Double.MaxValue
     var curBestModel: ARIMAModel  = null
     var done = false
@@ -390,12 +387,12 @@ object ARIMA {
       companionMatrix.setRow(n - 1, lastRow)
       if (n > 1) {
         companionMatrix.setSubMatrix(MatrixUtils
-          .createRealIdentityMatrix(n - 1).getData(), 0, 1)
+          .createRealIdentityMatrix(n - 1).getData, 0, 1)
       }
 
       val evd = new EigenDecomposition(companionMatrix)
       val roots = evd.getRealEigenvalues.zip(evd.getImagEigenvalues)
-      return roots.map {case (real, imag) => new Complex(real, imag)}
+      roots.map {case (real, imag) => new Complex(real, imag)}
     }
 }
 
@@ -529,7 +526,7 @@ class ARIMAModel(
       i += 1
     }
 
-    gradient := gradient :/ -sigma2
+    gradient := gradient /:/ -sigma2
     gradient.toArray
   }
 
@@ -638,7 +635,6 @@ class ARIMAModel(
     // changes(i) corresponds to the error term at index i, since when it is used we will have
     // removed AR and MA terms at index i
     iterateARMA(diffedExtended, changes, _ - _, errors = changes)
-    val breezeDestTs = toBreeze(destTs)
     toBreeze(destTs) := changes(maxLag to -1)
     destTs
   }
@@ -774,7 +770,7 @@ class ARIMAModel(
    *
    * @return indicator of whether model's AR parameters are stationary
    */
-  def isStationary(): Boolean = {
+  def isStationary: Boolean = {
     if (p == 0) {
       true
     } else {
@@ -792,7 +788,7 @@ class ARIMAModel(
    *
    * @return indicator of whether model's MA parameters are invertible
    */
-  def isInvertible(): Boolean = {
+  def isInvertible: Boolean = {
     if (q == 0) {
       true
     } else {

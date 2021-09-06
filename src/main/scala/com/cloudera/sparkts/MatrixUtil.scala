@@ -17,7 +17,9 @@ package com.cloudera.sparkts
 
 import breeze.linalg._
 import org.apache.spark.mllib.linalg.{DenseVector => SDV, SparseVector => SSV, Vector => SV}
-import org.apache.spark.mllib.linalg.{DenseMatrix => SDM, SparseMatrix => SSM, Matrix => SM}
+import org.apache.spark.mllib.linalg.{DenseMatrix => SDM, Matrix => SM, SparseMatrix => SSM}
+
+import scala.language.implicitConversions
 
 private[sparkts] object MatrixUtil {
   def transpose(arr: Array[Array[Double]]): Array[Array[Double]] = {
@@ -31,7 +33,7 @@ private[sparkts] object MatrixUtil {
   def matToRowArrs(mat: SM): Array[Array[Double]] = {
     val arrs = new Array[Array[Double]](mat.rows)
     for (r <- 0 until mat.rows) {
-      arrs(r) = toBreeze(mat)(r to r, 0 to mat.cols - 1).toDenseMatrix.toArray
+      arrs(r) = toBreeze(mat)(r to r, 0 until mat.cols).toDenseMatrix.toArray
     }
     arrs
   }
@@ -39,7 +41,7 @@ private[sparkts] object MatrixUtil {
   def matToRowArrs(mat: Matrix[Double]): Array[Array[Double]] = {
     val arrs = new Array[Array[Double]](mat.rows)
     for (r <- 0 until mat.rows) {
-      arrs(r) = mat(r to r, 0 to mat.cols - 1).toDenseMatrix.toArray
+      arrs(r) = mat(r to r, 0 until mat.cols).toDenseMatrix.toArray
     }
     arrs
   }
@@ -187,8 +189,8 @@ private[sparkts] object MatrixUtil {
   private[sparkts] implicit def dvBreezeToSpark(breezeVector: DenseVector[Double]): SDV =
     fromBreeze(breezeVector).asInstanceOf[SDV]
 
-  private[sparkts] implicit def fvtovBreezeToSpark(f: (Vector[Double]) => Vector[Double])
-    : (SV) => SV = {
+  private[sparkts] implicit def fvtovBreezeToSpark(f: Vector[Double] => Vector[Double])
+    : SV => SV = {
     v: SV => f(v)
   }
 
